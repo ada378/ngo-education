@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCert Platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#060612;color:#e2e8f0;min-height:100vh}
+input,button{font-family:inherit}
+input:focus{outline:none}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0c0c1e}
+::-webkit-scrollbar-thumb{background:#252540;border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.fade-in{animation:fadeIn .35s ease both}
+.slide-in{animation:slideIn .3s ease both}
+@media print{.no-print{display:none!important}body{background:#fff!important}}
+
+/* PAGES */
+.page{display:none;min-height:100vh}
+.page.active{display:flex}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;width:100%}
+.auth-box{max-width:420px;width:100%}
+.auth-logo{text-align:center;margin-bottom:28px}
+.logo-icon{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,#6366f1,#06b6d4);
+  display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 16px;
+  box-shadow:0 0 50px rgba(99,102,241,.4)}
+.auth-logo h1{color:#fff;font-size:26px;font-weight:900;margin-bottom:6px}
+.auth-logo p{color:#64748b;font-size:14px}
+.card{background:#0c0c1e;border:1px solid #1c1c38;border-radius:16px;padding:24px}
+.card h2{color:#fff;font-size:18px;font-weight:800;margin-bottom:20px}
+
+/* FORMS */
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:11px;color:#64748b;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px;font-weight:600}
+.fg input{width:100%;background:#080814;border:1px solid #1c1c38;border-radius:10px;padding:12px 16px;color:#e2e8f0;font-size:14px;transition:border-color .2s}
+.fg input:focus{border-color:#6366f1}
+.fg input::placeholder{color:#334155}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:10px;padding:11px 22px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-p{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.35)}
+.btn-g{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000}
+.btn-g:hover{transform:translateY(-1px)}
+.btn-gr{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+.btn-r{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.btn-gh{background:rgba(255,255,255,.05);border:1px solid #1c1c38;color:#64748b}
+.btn-gh:hover{background:rgba(255,255,255,.1);color:#e2e8f0}
+.btn-full{width:100%;padding:13px}
+.btn-sm{padding:8px 14px;font-size:12px}
+
+/* DASHBOARD */
+.dash{display:flex;min-height:100vh;width:100%}
+.sidebar{width:224px;background:#0c0c1e;border-right:1px solid #1c1c38;flex-shrink:0;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto}
+.sb-head{padding:20px 16px;border-bottom:1px solid #1c1c38}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);
+  display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #f59e0b;flex-shrink:0;overflow:hidden}
+.sb-avatar img{width:100%;height:100%;object-fit:cover}
+.sb-name{font-weight:700;color:#fff;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.sb-role{font-size:11px;color:#64748b}
+.sb-nav{flex:1;padding:8px}
+.ni{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:14px;margin:2px 0;color:#64748b;border-left:2px solid transparent;transition:all .15s}
+.ni:hover{background:rgba(99,102,241,.08);color:#a5b4fc}
+.ni.on{background:rgba(99,102,241,.15);color:#6366f1;font-weight:700;border-left-color:#6366f1}
+.ni-ic{font-size:16px}
+.nb{margin-left:auto;background:#ef4444;border-radius:20px;padding:2px 8px;font-size:10px;color:#fff;font-weight:800}
+.sb-foot{padding:12px;border-top:1px solid #1c1c38}
+.btn-out{width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:10px;color:#ef4444;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-out:hover{background:rgba(239,68,68,.15)}
+.main{flex:1;overflow-y:auto;min-width:0}
+.cw{padding:28px;max-width:860px}
+.sec{display:none}
+.sec.on{display:block}
+
+/* STAT CARDS */
+.sr{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.sc{background:#0c0c1e;border-radius:14px;padding:18px;text-align:center;flex:1;min-width:110px}
+.sc-ic{font-size:26px;margin-bottom:6px}
+.sc-v{font-size:24px;font-weight:800;margin-bottom:3px}
+.sc-l{font-size:11px;color:#64748b}
+
+/* TOAST */
+#toast{position:fixed;top:24px;right:24px;z-index:99999;display:none;align-items:center;gap:10px;border-radius:12px;padding:13px 18px;font-size:13px;font-weight:600;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+#toast.show{display:flex}
+#toast.ok{background:#0a1a10;border:1px solid rgba(16,185,129,.35);color:#86efac}
+#toast.err{background:#1a0a0a;border:1px solid rgba(239,68,68,.35);color:#fca5a5}
+.td{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* VIDEO MODAL */
+.mo,.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(12px);overflow-y:auto}
+.mo.open,.modal-overlay.open{display:flex}
+.mb{background:#0c0c1e;border:1px solid #1c1c38;border-radius:20px;padding:28px;max-width:520px;width:100%;box-shadow:0 40px 80px rgba(0,0,0,.8)}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.mt{font-weight:800;color:#fff;font-size:16px}
+.ms{font-size:12px;color:#64748b;margin-top:3px}
+.mc{background:rgba(255,255,255,.06);border:1px solid #1c1c38;border-radius:8px;width:34px;height:34px;color:#aaa;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mc:hover{background:rgba(255,255,255,.12);color:#fff}
+.vs{background:#020208;border-radius:14px;height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;position:relative;overflow:hidden;border:1px solid #1c1c38;font-size:64px}
+.po{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3)}
+.pb{width:52px;height:52px;border-radius:50%;background:rgba(99,102,241,.8);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:transform .2s}
+.pb:hover{transform:scale(1.1)}
+.pl{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:#64748b}
+.pt{background:#334155;border-radius:6px;height:6px;overflow:hidden}
+.pf{height:100%;border-radius:6px;transition:width .15s;background:linear-gradient(90deg,#6366f1,#06b6d4)}
+.pf.done{background:linear-gradient(90deg,#10b981,#34d399)}
+
+/* CERT MODAL */
+#cm{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;padding:16px;backdrop-filter:blur(12px);overflow-y:auto}
+#cm.open{display:flex}
+.ca{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.cw2{width:100%;max-width:680px;position:relative}
+.cg{position:absolute;inset:-2px;border-radius:20px;background:linear-gradient(135deg,#f59e0b,#6366f1,#f59e0b,#06b6d4);z-index:-1;filter:blur(1px)}
+.cc{background:linear-gradient(160deg,#08061a,#0e0830,#06101e);border-radius:18px;overflow:hidden;position:relative}
+.ctb{height:5px;background:linear-gradient(90deg,#f59e0b,#6366f1,#06b6d4,#6366f1,#f59e0b)}
+.cb{padding:32px 36px 28px}
+.ch{text-align:center;margin-bottom:22px}
+.clr{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:10px}
+.cl{flex:1;height:1px}
+.cli{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#6366f1);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 30px rgba(245,158,11,.3)}
+.cp{font-size:10px;letter-spacing:5px;color:#f59e0b;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.ctt{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.cd{display:flex;justify-content:center;gap:6px;align-items:center}
+.cr{text-align:center;margin-bottom:20px}
+.ccy{color:#64748b;font-size:12px;margin:0 0 14px;letter-spacing:1px}
+.cur{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.cpw{position:relative}
+.cpi{width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #f59e0b;box-shadow:0 0 24px rgba(245,158,11,.3)}
+.cpck{position:absolute;bottom:0;right:0;width:22px;height:22px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid #06101e}
+.cun{font-size:26px;font-weight:900;color:#f59e0b;font-style:italic;text-shadow:0 0 30px rgba(245,158,11,.35);line-height:1.1}
+.cul{font-size:12px;color:#64748b;margin-top:4px}
+.ccs{text-align:center;margin-bottom:20px}
+.cco{color:#64748b;font-size:11px;margin:0 0 8px;text-transform:uppercase;letter-spacing:2px}
+.ccb{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:12px 24px;display:inline-block}
+.ccn{font-size:16px;font-weight:700;color:#c7d2fe}
+.cst{display:flex;justify-content:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.csi{text-align:center;padding:10px 16px;border-radius:10px}
+.csil{font-size:10px;color:#64748b;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.csiv{font-size:15px;font-weight:800}
+.cf{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid rgba(255,255,255,.06);padding-top:16px;flex-wrap:wrap;gap:10px}
+.cfi{text-align:center}
+.cqr{width:52px;height:52px;background:rgba(255,255,255,.03);border:1px solid #252540;border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:9px;color:#444;font-family:monospace;line-height:1.5}
+.cfl{font-size:9px;color:#3a3a5a;letter-spacing:2px}
+.csig{font-family:Georgia,serif;font-size:20px;color:#f59e0b;font-style:italic;margin-bottom:3px}
+.csl{height:1px;width:150px;margin:0 auto 4px;background:linear-gradient(90deg,transparent,rgba(245,158,11,.55),transparent)}
+.cse{width:52px;height:52px;border-radius:50%;border:2px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;background:rgba(245,158,11,.04);font-size:22px}
+.cidr{margin-top:14px;padding:8px 14px;background:rgba(0,0,0,.3);border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.cidl{font-size:10px;color:#3a3a5a;letter-spacing:2px}
+.cidv{font-size:11px;font-family:monospace;color:#6366f1;letter-spacing:2px}
+.cbb{height:3px;background:linear-gradient(90deg,#6366f1,#06b6d4,#f59e0b)}
+
+/* VIDEO CARD */
+.vc{background:#0c0c1e;border:1px solid #1c1c38;border-radius:16px;padding:20px;margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;transition:all .2s}
+.vc.wtd{background:linear-gradient(135deg,#0a0a1e,#0a1a0a);border-color:rgba(16,185,129,.3)}
+.vth{width:60px;height:60px;border-radius:14px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.vi{flex:1;min-width:160px}
+.vtr{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.vtit{font-weight:800;color:#fff;font-size:15px}
+.lv{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700}
+.lv-b{background:rgba(16,185,129,.15);color:#10b981}
+.lv-i{background:rgba(245,158,11,.15);color:#f59e0b}
+.lv-a{background:rgba(239,68,68,.15);color:#ef4444}
+.vd{font-size:12px;color:#64748b;margin-bottom:4px}
+.vm2{font-size:11px;color:#334155}
+.va{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.db{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:8px 12px;font-size:12px;color:#10b981;font-weight:700}
+
+/* HOW IT WORKS */
+.hw{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid #1c1c38}
+.hw:last-child{border-bottom:none}
+.hwi{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+
+/* TEST */
+.tg{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.tic{flex:1;min-width:90px;text-align:center;padding:12px 8px;border-radius:12px}
+.tpb{background:#334155;border-radius:8px;height:6px;margin-bottom:24px;overflow:hidden}
+.tpf{height:100%;background:linear-gradient(90deg,#6366f1,#06b6d4);border-radius:8px;transition:width .4s}
+.tq{font-size:18px;font-weight:800;color:#fff;margin-bottom:22px;line-height:1.5}
+.ob{display:block;width:100%;text-align:left;background:#08080e;border:1px solid #1c1c38;border-radius:12px;padding:13px 18px;margin-bottom:10px;color:#64748b;font-size:14px;cursor:pointer;transition:all .2s}
+.ob:hover{border-color:#6366f1;color:#fff;background:rgba(99,102,241,.08)}
+.ol{color:#6366f1;font-weight:800;margin-right:10px}
+
+/* CERTS GRID */
+.cg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.cm2{border-radius:16px;padding:20px;cursor:pointer;transition:all .25s;background:linear-gradient(145deg,#0c0c1e,#0e0e28)}
+.cm2:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+
+/* MISC */
+.es{text-align:center;padding:52px;color:#64748b}
+.eic{font-size:48px;margin-bottom:12px}
+.dh{margin-top:16px;padding:12px 14px;background:#0a0a16;border-radius:10px;font-size:12px;color:#444;border-left:3px solid rgba(99,102,241,.35)}
+.lnk{color:#6366f1;cursor:pointer;font-weight:700}
+.lnk:hover{text-decoration:underline}
+
+/* PHOTO UPLOAD */
+.pu{display:flex;flex-direction:column;align-items:center;margin-bottom:22px}
+.pc{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;transition:all .25s;border:2px dashed #252540;background:#0a0a18}
+.pc:hover{border-color:#6366f1}
+.pc.hp{border-style:solid;border-color:#f59e0b;box-shadow:0 0 24px rgba(245,158,11,.2)}
+.pc img{width:100%;height:100%;object-fit:cover}
+.plb{margin-top:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:7px 18px;font-size:12px;color:#6366f1;font-weight:600;cursor:pointer}
+.ph{font-size:11px;color:#64748b;margin-top:4px}
+
+@media(max-width:640px){
+  .sidebar{display:none}
+  .cw{padding:16px}
+  .cb{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOAST -->
+<div id="toast"><div class="td" id="td"></div><span id="tt"></span></div>
+
+<!-- LOGIN -->
+<div id="pg-login" class="page active" style="background:radial-gradient(ellipse at 30% 20%,#1e1040,#060612 60%)">
+  <div class="auth-wrap">
+    <div class="auth-box fade-in">
+      <div class="auth-logo">
+        <div class="logo-icon">🎓</div>
+        <h1>EduCert Platform</h1>
+        <p>Learn · Test · Get Certified</p>
+      </div>
+      <div class="card">
+        <h2>Welcome back 👋</h2>
+        <div class="fg"><label>Email</label><input id="le" type="email" placeholder="your@email.com"></div>
+        <div class="fg"><label>Password</label><input id="lp" type="password" placeholder="••••••••"></div>
+        <button class="btn btn-p btn-full" onclick="doLogin()">Login →</button>
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#64748b">Account nahi? <span class="lnk" onclick="showPg('register')">Register karo</span></p>
+        <div class="dh">🔑 Demo: admin@edu.com / admin123</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="pg-register" class="page" style="background:radial-gradient(ellipse at 70% 20%,#0e2040,#060612 60%)">
+  <div class="auth-wrap">
+    <div class="auth-box fade-in" style="max-width:440px">
+      <div class="auth-logo">
+        <div class="logo-icon" style="background:linear-gradient(135deg,#06b6d4,#3b82f6);box-shadow:0 0 40px rgba(6,182,212,.3)">📝</div>
+        <h1>Create Account</h1>
+        <p>Start your learning journey</p>
+      </div>
+      <div class="card">
+        <div class="pu">
+          <div class="pc" id="pc" onclick="document.getElementById('pi').click()">
+            <div style="text-align:center"><div style="font-size:28px">📷</div><div style="font-size:10px;color:#64748b;margin-top:3px">Upload</div></div>
+          </div>
+          <div class="plb" onclick="document.getElementById('pi').click()">📁 Upload Photo</div>
+          <input type="file" id="pi" accept="image/*" style="display:none" onchange="onPhoto(this)">
+          <span class="ph">Profile photo (optional, max 5MB)</span>
+        </div>
+        <div class="fg"><label>Full Name</label><input id="rn" placeholder="Apna poora naam"></div>
+        <div class="fg"><label>Email</label><input id="re" type="email" placeholder="your@email.com"></div>
+        <div class="fg"><label>Password</label><input id="rp" type="password" placeholder="Min. 6 characters"></div>
+        <button class="btn btn-full" style="background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff" onclick="doReg()">Create Account →</button>
+        <p style="text-align:center;margin-top:14px;font-size:13px;color:#64748b">Account hai? <span class="lnk" onclick="showPg('login')">Login karo</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USER DASHBOARD -->
+<div id="pg-user" class="page">
+  <div class="dash">
+    <div class="sidebar">
+      <div class="sb-head">
+        <div class="sb-user">
+          <div class="sb-avatar" id="u-av">👤</div>
+          <div><div class="sb-name" id="u-nm">User</div><div class="sb-role">Student</div></div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="ni on" onclick="uMenu('db',this)"><span class="ni-ic">🏠</span>Dashboard</div>
+        <div class="ni" onclick="uMenu('vd',this)"><span class="ni-ic">🎬</span>Videos</div>
+        <div class="ni" onclick="uMenu('ts',this)"><span class="ni-ic">📝</span>Test</div>
+        <div class="ni" onclick="uMenu('mc',this)"><span class="ni-ic">🏆</span>My Certs</div>
+      </div>
+      <div class="sb-foot"><button class="btn-out" onclick="logout()">🚪 Logout</button></div>
+    </div>
+    <div class="main"><div class="cw fade-in">
+      <!-- Dashboard -->
+      <div id="u-db" class="sec on">
+        <div style="margin-bottom:26px">
+          <h2 style="color:#fff;font-size:22px;font-weight:900;margin-bottom:4px">👋 Hello, <span id="u-wn">User</span>!</h2>
+          <p style="color:#64748b;font-size:14px">Aaj kuch naya seekhte hain 🚀</p>
+        </div>
+        <div class="sr">
+          <div class="sc" style="border:1px solid rgba(99,102,241,.15)"><div class="sc-ic">🎬</div><div class="sc-v" id="u-sw" style="color:#6366f1">0/4</div><div class="sc-l">Videos Watched</div></div>
+          <div class="sc" style="border:1px solid rgba(245,158,11,.15)"><div class="sc-ic">🏆</div><div class="sc-v" id="u-sc" style="color:#f59e0b">0</div><div class="sc-l">My Certs</div></div>
+          <div class="sc" style="border:1px solid rgba(6,182,212,.15)"><div class="sc-ic">📝</div><div class="sc-v" id="u-st" style="color:#06b6d4">—</div><div class="sc-l">Test Status</div></div>
+        </div>
+        <div class="card">
+          <h3 style="color:#64748b;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">How It Works</h3>
+          <div class="hw"><div class="hwi" style="background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2)">🎬</div><div><div style="font-weight:700;color:#fff;margin-bottom:3px;font-size:14px">Video Watch Karo</div><div style="font-size:12px;color:#64748b">Koi bhi video dekho — complete hote hi auto certificate milega</div></div></div>
+          <div class="hw"><div class="hwi" style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.15)">📝</div><div><div style="font-weight:700;color:#fff;margin-bottom:3px;font-size:14px">Test Do</div><div style="font-size:12px;color:#64748b">5 questions ka test do, 60%+ score pe certificate apply hoga</div></div></div>
+          <div class="hw"><div class="hwi" style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.15)">✅</div><div><div style="font-weight:700;color:#fff;margin-bottom:3px;font-size:14px">Admin Approve Karega</div><div style="font-size:12px;color:#64748b">Admin approve karte hi official certificate issue ho jayega</div></div></div>
+        </div>
+      </div>
+      <!-- Videos -->
+      <div id="u-vd" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">🎬 Course Videos</h2><div id="vl"></div></div>
+      <!-- Test -->
+      <div id="u-ts" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">📝 Assessment Test</h2><div id="tc"></div></div>
+      <!-- My Certs -->
+      <div id="u-mc" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">🏆 My Certificates</h2><div id="mcl"></div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="pg-admin" class="page">
+  <div class="dash">
+    <div class="sidebar">
+      <div class="sb-head">
+        <div class="sb-user">
+          <div class="sb-avatar" style="border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#06b6d4)">🛡</div>
+          <div><div class="sb-name">Admin Panel</div><div class="sb-role">EduCert</div></div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="ni on" onclick="aMenu('db',this)"><span class="ni-ic">📊</span>Dashboard</div>
+        <div class="ni" onclick="aMenu('us',this)"><span class="ni-ic">👥</span>Users</div>
+        <div class="ni" id="ap-nav" onclick="aMenu('ap',this)"><span class="ni-ic">⏳</span>Approvals</div>
+        <div class="ni" onclick="aMenu('ct',this)"><span class="ni-ic">🏆</span>All Certs</div>
+      </div>
+      <div class="sb-foot"><button class="btn-out" onclick="logout()">🚪 Logout</button></div>
+    </div>
+    <div class="main"><div class="cw fade-in">
+      <div id="a-db" class="sec on">
+        <h2 style="color:#fff;font-weight:900;font-size:22px;margin-bottom:22px">📊 Admin Dashboard</h2>
+        <div class="sr">
+          <div class="sc" style="border:1px solid rgba(6,182,212,.15)"><div class="sc-ic">👥</div><div class="sc-v" id="a-su" style="color:#06b6d4">0</div><div class="sc-l">Total Users</div></div>
+          <div class="sc" style="border:1px solid rgba(245,158,11,.15)"><div class="sc-ic">🏆</div><div class="sc-v" id="a-sc" style="color:#f59e0b">0</div><div class="sc-l">Certificates</div></div>
+          <div class="sc" style="border:1px solid rgba(239,68,68,.15)"><div class="sc-ic">⏳</div><div class="sc-v" id="a-sp" style="color:#ef4444">0</div><div class="sc-l">Pending</div></div>
+          <div class="sc" style="border:1px solid rgba(16,185,129,.15)"><div class="sc-ic">✅</div><div class="sc-v" id="a-st2" style="color:#10b981">0</div><div class="sc-l">Test Certs</div></div>
+        </div>
+        <div id="a-qp"></div>
+      </div>
+      <div id="a-us" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">👥 Registered Users</h2><div id="a-ul"></div></div>
+      <div id="a-ap" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">⏳ Pending Approvals</h2><div id="a-al"></div></div>
+      <div id="a-ct" class="sec"><h2 style="color:#fff;font-weight:900;margin-bottom:20px">🏆 All Issued Certificates</h2><div id="a-cl"></div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div id="vm" class="mo">
+  <div class="mb fade-in">
+    <div class="mh">
+      <div><div class="mt" id="vm-t"></div><div class="ms" id="vm-s"></div></div>
+      <div class="mc" onclick="closeVM()">✕</div>
+    </div>
+    <div class="vs" id="vm-sc"><span id="vm-em"></span><div class="po" id="vm-po"><div class="pb" onclick="togglePlay()">▶</div></div></div>
+    <div style="margin-bottom:16px">
+      <div class="pl"><span id="vm-st">Paused</span><span id="vm-pc" style="color:#e2e8f0">0%</span></div>
+      <div class="pt"><div class="pf" id="vm-bar" style="width:0%"></div></div>
+    </div>
+    <button class="btn btn-p btn-full" id="vm-btn" onclick="togglePlay()" style="font-size:15px">▶ Start Watching</button>
+  </div>
+</div>
+
+<!-- CERT MODAL -->
+<div id="cm" class="modal-overlay">
+  <div class="ca no-print">
+    <button class="btn btn-g" onclick="printCert()">🖨 Save / Print</button>
+    <button class="btn btn-gh" onclick="document.getElementById('cm').classList.remove('open')">✕ Close</button>
+  </div>
+  <div class="cw2">
+    <div class="cg"></div>
+    <div class="cc" id="c-printable">
+      <div class="ctb"></div>
+      <div class="cb">
+        <div class="ch">
+          <div class="clr">
+            <div class="cl" style="background:linear-gradient(90deg,transparent,rgba(245,158,11,.4))"></div>
+            <div class="cli">🎓</div>
+            <div class="cl" style="background:linear-gradient(90deg,rgba(245,158,11,.4),transparent)"></div>
+          </div>
+          <div class="cp">EduCert Platform</div>
+          <div class="ctt" id="c-tt">Certificate of Completion</div>
+          <div class="cd">
+            <div style="width:12px;height:2px;border-radius:2px;background:#f59e0b"></div>
+            <div style="width:32px;height:2px;border-radius:2px;background:#6366f1"></div>
+            <div style="width:12px;height:2px;border-radius:2px;background:#06b6d4"></div>
+          </div>
+        </div>
+        <div class="cr">
+          <p class="ccy">THIS IS TO CERTIFY THAT</p>
+          <div class="cur">
+            <div class="cpw">
+              <div id="c-ph"></div>
+              <div class="cpck">✓</div>
+            </div>
+            <div>
+              <div class="cun" id="c-un"></div>
+              <div class="cul">Verified Learner</div>
+            </div>
+          </div>
+        </div>
+        <div class="ccs">
+          <p class="cco" id="c-co">has successfully completed</p>
+          <div class="ccb"><div class="ccn" id="c-cn"></div></div>
+        </div>
+        <div class="cst" id="c-st"></div>
+        <div class="cf">
+          <div class="cfi"><div class="cqr" id="c-qr">▓▒░<br/>▒▒<br/>░▒▓</div><div class="cfl">SCAN TO VERIFY</div></div>
+          <div class="cfi"><div class="csig">EduCert Authority</div><div class="csl"></div><div class="cfl">AUTHORIZED SIGNATURE</div></div>
+          <div class="cfi"><div class="cse">🎓</div><div class="cfl">OFFICIAL SEAL</div></div>
+        </div>
+        <div class="cidr"><span class="cidl">CERTIFICATE ID</span><span class="cidv" id="c-id"></span></div>
+      </div>
+      <div class="cbb"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end app -->
+
+<script>
+// ═══ DATA ═══
+const VIDS=[
+  {id:1,title:"Introduction to React",dur:"12:30",em:"⚛️",desc:"React fundamentals — components, props, state.",lv:"Beginner",ls:8},
+  {id:2,title:"JavaScript Mastery",dur:"18:45",em:"📜",desc:"Closures, async/await, ES6+ features.",lv:"Intermediate",ls:12},
+  {id:3,title:"CSS & Modern Styling",dur:"09:20",em:"🎨",desc:"Flexbox, Grid, animations, responsive design.",lv:"Beginner",ls:6},
+  {id:4,title:"Node.js Backend",dur:"22:10",em:"🟢",desc:"REST APIs, Express.js, middleware, databases.",lv:"Advanced",ls:15},
+];
+const QS=[
+  {q:"React kya hai?",o:["Database","UI Library","Language","OS"],a:1},
+  {q:"JSX ka full form?",o:["Java Syntax X","JavaScript XML","JSON Extra","None"],a:1},
+  {q:"useState kya return karta hai?",o:["Object","Array [value, setter]","String","Number"],a:1},
+  {q:"Props kaise pass hote hain?",o:["Child→Parent","Parent→Child","Sibling→Sibling","Koi bhi"],a:1},
+  {q:"useEffect kab run hota hai?",o:["Sirf mount pe","Har render pe","Dependency change pe","B aur C dono"],a:3},
+];
+
+// ═══ STATE ═══
+let users=[{id:0,name:"Admin",email:"admin@edu.com",password:"admin123",role:"admin",photo:null,reg:dStr()}];
+let CU=null,cards=[],pending=[],watched={},regPhoto=null,testSt=null;
+let vs={id:null,prog:0,play:false,tmr:null};
+
+function genId(){return"CERT-"+Math.random().toString(36).substr(2,8).toUpperCase()}
+function dStr(){return new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"long",year:"numeric"})}
+
+// ═══ TOAST ═══
+let ttmr;
+function toast(m,t="ok"){
+  clearTimeout(ttmr);
+  const el=document.getElementById("toast");
+  document.getElementById("tt").textContent=m;
+  document.getElementById("td").style.background=t==="ok"?"#10b981":"#ef4444";
+  el.className="show "+t;
+  ttmr=setTimeout(()=>el.className="",3500);
+}
+
+// ═══ PAGES ═══
+function showPg(n){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("pg-"+n).classList.add("active");
+}
+
+// ═══ AUTH ═══
+function doLogin(){
+  const e=document.getElementById("le").value.trim();
+  const p=document.getElementById("lp").value;
+  const u=users.find(u=>u.email===e&&u.password===p);
+  if(!u)return toast("❌ Email ya password galat hai!","err");
+  CU=u;
+  if(u.role==="admin"){showPg("admin");rADash();}
+  else{
+    document.getElementById("u-nm").textContent=u.name;
+    document.getElementById("u-wn").textContent=u.name;
+    if(u.photo)document.getElementById("u-av").innerHTML=`<img src="${u.photo}">`;
+    uStats();showPg("user");
+  }
+}
+function doReg(){
+  const n=document.getElementById("rn").value.trim();
+  const e=document.getElementById("re").value.trim();
+  const p=document.getElementById("rp").value;
+  if(!n||!e||!p)return toast("❌ Sab fields bharo!","err");
+  if(!/\S+@\S+\.\S+/.test(e))return toast("❌ Valid email daalo!","err");
+  if(p.length<6)return toast("❌ Password 6+ characters!","err");
+  if(users.find(u=>u.email===e))return toast("❌ Email already registered!","err");
+  users.push({id:Date.now(),name:n,email:e,password:p,role:"user",photo:regPhoto,reg:dStr()});
+  toast("✅ Registration ho gayi! Ab login karo.");
+  showPg("login");
+  ["rn","re","rp"].forEach(id=>document.getElementById(id).value="");
+  regPhoto=null;
+  document.getElementById("pc").innerHTML=`<div style="text-align:center"><div style="font-size:28px">📷</div><div style="font-size:10px;color:#64748b;margin-top:3px">Upload</div></div>`;
+  document.getElementById("pc").classList.remove("hp");
+}
+function logout(){CU=null;testSt=null;showPg("login")}
+function onPhoto(inp){
+  const f=inp.files[0];if(!f)return;
+  if(!f.type.startsWith("image/"))return alert("Sirf image!");
+  if(f.size>5*1024*1024)return alert("5MB se choti!");
+  const r=new FileReader();
+  r.onload=ev=>{
+    regPhoto=ev.target.result;
+    const pc=document.getElementById("pc");
+    pc.innerHTML=`<img src="${regPhoto}" alt="p">`;
+    pc.classList.add("hp");
+  };
+  r.readAsDataURL(f);
+}
+
+// ═══ USER MENU ═══
+function uMenu(sec,el){
+  document.querySelectorAll("#pg-user .sec").forEach(s=>s.classList.remove("on"));
+  document.getElementById("u-"+sec).classList.add("on");
+  document.querySelectorAll("#pg-user .ni").forEach(n=>n.classList.remove("on"));
+  el.classList.add("on");
+  if(sec==="vd")rVids();
+  if(sec==="ts")rTest();
+  if(sec==="mc")rMyCerts();
+  if(sec==="db")uStats();
+}
+
+// ═══ USER STATS ═══
+function uStats(){
+  const id=CU.id;
+  const wc=Object.keys(watched).filter(k=>k.startsWith(id+"-")).length;
+  document.getElementById("u-sw").textContent=wc+"/"+VIDS.length;
+  document.getElementById("u-sc").textContent=cards.filter(c=>c.uid===id).length;
+  const hc=cards.some(c=>c.uid===id&&c.type==="test");
+  const hp=pending.some(p=>p.uid===id);
+  document.getElementById("u-st").textContent=hc?"✅":hp?"⏳":"—";
+}
+
+// ═══ VIDEOS ═══
+function rVids(){
+  const id=CU.id;
+  document.getElementById("vl").innerHTML=VIDS.map(v=>{
+    const w=watched[id+"-"+v.id];
+    const vc=cards.find(c=>c.uid===id&&c.type==="video"&&c.course===v.title);
+    const lvc=v.lv.toLowerCase().charAt(0)==='b'?'b':v.lv.toLowerCase().charAt(0)==='i'?'i':'a';
+    return`<div class="vc${w?" wtd":""}">
+      <div class="vth">${v.em}</div>
+      <div class="vi">
+        <div class="vtr"><span class="vtit">${v.title}</span><span class="lv lv-${lvc}">${v.lv}</span></div>
+        <div class="vd">${v.desc}</div>
+        <div class="vm2">⏱ ${v.dur} • ${v.ls} lessons</div>
+      </div>
+      <div class="va">
+        ${w
+          ?`<span class="db">✅ Done</span><button class="btn btn-gh btn-sm" style="color:#f59e0b;border-color:rgba(245,158,11,.25)" onclick='openCert(${JSON.stringify(vc)})'>🏆 Cert</button>`
+          :`<button class="btn btn-p btn-sm" onclick="openVM(${v.id})">▶ Watch</button>`
+        }
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ═══ VIDEO MODAL ═══
+function openVM(vid){
+  const v=VIDS.find(x=>x.id===vid);if(!v)return;
+  vs={id:vid,prog:0,play:false,tmr:null};
+  document.getElementById("vm-t").textContent=v.em+" "+v.title;
+  document.getElementById("vm-s").textContent="⏱ "+v.dur+" • "+v.lv;
+  document.getElementById("vm-sc").innerHTML=`<div id="vm-em" style="font-size:64px">${v.em}</div><div class="po" id="vm-po"><div class="pb" onclick="togglePlay()">▶</div></div>`;
+  document.getElementById("vm-bar").style.width="0%";
+  document.getElementById("vm-bar").className="pf";
+  document.getElementById("vm-st").textContent="Paused";
+  document.getElementById("vm-pc").textContent="0%";
+  const btn=document.getElementById("vm-btn");
+  btn.textContent="▶ Start Watching";
+  btn.style.background="linear-gradient(135deg,#6366f1,#4f46e5)";
+  btn.style.color="#fff";
+  btn.onclick=togglePlay;
+  document.getElementById("vm").classList.add("open");
+}
+function closeVM(){
+  clearInterval(vs.tmr);vs.play=false;
+  document.getElementById("vm").classList.remove("open");
+}
+// Close modals on backdrop click
+document.getElementById("vm").addEventListener("click",function(e){if(e.target===this)closeVM()});
+document.getElementById("cm").addEventListener("click",function(e){if(e.target===this)this.classList.remove("open")});
+function togglePlay(){
+  if(vs.prog>=100)return;
+  vs.play=!vs.play;
+  const po=document.getElementById("vm-po");
+  if(vs.play){
+    if(po)po.style.display="none";
+    document.getElementById("vm-st").textContent="Watching...";
+    const btn=document.getElementById("vm-btn");
+    btn.textContent="⏸ Pause";
+    btn.style.background="linear-gradient(135deg,#ef4444,#dc2626)";
+    vs.tmr=setInterval(()=>{
+      vs.prog+=1.5;
+      if(vs.prog>=100){vs.prog=100;clearInterval(vs.tmr);vs.play=false;onVideoDone();return;}
+      document.getElementById("vm-bar").style.width=vs.prog+"%";
+      document.getElementById("vm-pc").textContent=Math.round(vs.prog)+"%";
+    },80);
+  } else {
+    clearInterval(vs.tmr);
+    if(po)po.style.display="flex";
+    document.getElementById("vm-st").textContent="Paused";
+    const btn=document.getElementById("vm-btn");
+    btn.textContent="▶ Resume Watching";
+    btn.style.background="linear-gradient(135deg,#6366f1,#4f46e5)";
+  }
+}
+function onVideoDone(){
+  const v=VIDS.find(x=>x.id===vs.id);
+  watched[CU.id+"-"+v.id]=true;
+  const cert={id:genId(),type:"video",userName:CU.name,photo:CU.photo,course:v.title,date:dStr(),uid:CU.id};
+  cards.push(cert);
+  document.getElementById("vm-bar").className="pf done";
+  document.getElementById("vm-bar").style.width="100%";
+  document.getElementById("vm-st").textContent="✅ Completed!";
+  document.getElementById("vm-pc").textContent="100%";
+  document.getElementById("vm-sc").innerHTML=`<span style="font-size:56px">✅</span>`;
+  const btn=document.getElementById("vm-btn");
+  btn.textContent="🏆 Claim My Certificate!";
+  btn.style.background="linear-gradient(135deg,#f59e0b,#d97706)";
+  btn.style.color="#000";
+  btn.onclick=()=>{closeVM();openCert(cert);};
+  toast("🎓 Certificate generate ho gaya!");
+  uStats();
+}
+
+// ═══ TEST ═══
+function rTest(){
+  const id=CU.id;
+  const hc=cards.some(c=>c.uid===id&&c.type==="test");
+  const hp=pending.some(p=>p.uid===id);
+  const tc=document.getElementById("tc");
+  if(!testSt){
+    tc.innerHTML=`<div class="card">
+      <div class="tg">
+        <div class="tic" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)"><div style="font-size:22px;margin-bottom:4px">📋</div><div style="font-size:12px;font-weight:700;color:#3b82f6">5 Questions</div></div>
+        <div class="tic" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)"><div style="font-size:22px;margin-bottom:4px">🎯</div><div style="font-size:12px;font-weight:700;color:#f59e0b">60% Passing</div></div>
+        <div class="tic" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15)"><div style="font-size:22px;margin-bottom:4px">⏱</div><div style="font-size:12px;font-weight:700;color:#6366f1">~5 Mins</div></div>
+      </div>
+      <p style="color:#64748b;font-size:14px;margin-bottom:22px">React & JavaScript Fundamentals ka test do. 60%+ lao aur certificate pao!</p>
+      ${hc?`<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:14px 18px;color:#10b981;font-weight:700">🎓 Already certified!</div>`
+        :hp?`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:14px 18px;color:#f59e0b;font-weight:700">⏳ Admin approval ka wait...</div>`
+        :`<button class="btn btn-p" style="padding:13px 28px;font-size:15px" onclick="startTest()">🚀 Test Shuru Karo</button>`}
+    </div>`;
+  } else if(testSt.score===null){
+    const q=QS[testSt.q],pct=Math.round(testSt.q/QS.length*100);
+    tc.innerHTML=`<div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:12px;color:#64748b">Q ${testSt.q+1} / ${QS.length}</span>
+        <span style="font-size:12px;color:#6366f1;font-weight:700">${pct}%</span>
+      </div>
+      <div class="tpb"><div class="tpf" style="width:${pct}%"></div></div>
+      <div class="tq">${q.q}</div>
+      ${q.o.map((op,i)=>`<button class="ob" onclick="ansQ(${i})"><span class="ol">${["A","B","C","D"][i]}.</span>${op}</button>`).join("")}
+    </div>`;
+  } else {
+    const pass=testSt.score>=60;
+    tc.innerHTML=`<div class="card" style="text-align:center">
+      <div style="font-size:60px;margin-bottom:12px">${pass?"🎉":"😔"}</div>
+      <div style="font-size:52px;font-weight:900;color:${pass?"#10b981":"#ef4444"};margin-bottom:6px">${testSt.score}%</div>
+      <div style="color:#64748b;margin-bottom:22px">${pass?"Bahut achha! Admin approval ka wait karo.":"60% chahiye tha. Dobara try karo!"}</div>
+      ${pass?`<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:13px 20px;color:#f59e0b;font-weight:700;display:inline-block">⏳ Pending Admin Approval</div>`
+        :`<button class="btn btn-r" onclick="startTest()">🔄 Retry</button>`}
+      <div style="margin-top:16px"><button class="btn btn-gh" onclick="testSt=null;rTest()">← Back</button></div>
+    </div>`;
+  }
+}
+function startTest(){testSt={q:0,ans:[],score:null};rTest()}
+function ansQ(i){
+  testSt.ans.push(i);
+  if(testSt.q+1<QS.length){testSt.q++;rTest();}
+  else{
+    const sc=Math.round(testSt.ans.filter((a,j)=>a===QS[j].a).length/QS.length*100);
+    testSt.score=sc;
+    if(sc>=60){
+      pending.push({id:genId(),type:"test",userName:CU.name,photo:CU.photo,course:"React & JS Fundamentals",score:sc,date:dStr(),uid:CU.id});
+      toast("✅ Pass! Admin approval pending.");
+    } else toast("❌ Score: "+sc+"%. 60% chahiye tha!","err");
+    uStats();rTest();
+  }
+}
+
+// ═══ MY CERTS ═══
+function rMyCerts(){
+  const mc=cards.filter(c=>c.uid===CU.id);
+  const el=document.getElementById("mcl");
+  if(!mc.length){el.innerHTML=`<div class="card es"><div class="eic">🎓</div>Abhi koi certificate nahi. Videos dekho aur test do!</div>`;return;}
+  el.innerHTML=`<div class="cg2">${mc.map(c=>`
+    <div class="cm2" style="border:1px solid ${c.type==="video"?"rgba(99,102,241,.25)":"rgba(245,158,11,.25)"}" onclick='openCert(${JSON.stringify(c)})'>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div style="width:46px;height:46px;border-radius:12px;background:${c.type==="video"?"rgba(99,102,241,.12)":"rgba(245,158,11,.1)"};display:flex;align-items:center;justify-content:center;font-size:22px">${c.type==="video"?"🎬":"🏆"}</div>
+        <span style="font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;background:${c.type==="video"?"rgba(99,102,241,.12)":"rgba(245,158,11,.1)"};color:${c.type==="video"?"#6366f1":"#f59e0b"};border:1px solid ${c.type==="video"?"rgba(99,102,241,.25)":"rgba(245,158,11,.25)"}">${c.type==="video"?"VIDEO":"TEST"}</span>
+      </div>
+      <div style="font-weight:800;color:#fff;margin-bottom:4px">${c.course}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:8px">📅 ${c.date}</div>
+      ${c.score?`<div style="font-size:13px;color:#06b6d4;font-weight:700;margin-bottom:10px">Score: ${c.score}%</div>`:""}
+      <div style="font-size:10px;font-family:monospace;color:#334155;padding:7px 10px;background:#08080e;border-radius:6px">${c.id}</div>
+      <div style="margin-top:12px;font-size:12px;color:#6366f1;text-align:center">👁 View Certificate</div>
+    </div>`).join("")}</div>`;
+}
+
+// ═══ CERT MODAL ═══
+function openCert(c){
+  if(!c)return;
+  document.getElementById("c-tt").textContent=c.type==="video"?"Certificate of Completion":"Certificate of Achievement";
+  document.getElementById("c-co").textContent=c.type==="video"?"has successfully completed":"has passed the assessment";
+  document.getElementById("c-un").textContent=c.userName;
+  document.getElementById("c-cn").textContent=c.course;
+  document.getElementById("c-id").textContent=c.id;
+  document.getElementById("c-qr").innerHTML=`▓▒░<br/>▒${c.id.slice(-4)}<br/>░▒▓`;
+  document.getElementById("c-ph").innerHTML=c.photo
+    ?`<img class="cpi" src="${c.photo}" alt="u">`
+    :`<div class="cpi" style="background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:28px">👤</div>`;
+  const g=c.score>=90?"A+":c.score>=80?"A":c.score>=70?"B+":c.score>=60?"B":null;
+  let sh="";
+  if(c.score)sh+=`<div class="csi" style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div class="csil">📊 Score</div><div class="csiv" style="color:#f59e0b">${c.score}%</div></div>`;
+  if(g)sh+=`<div class="csi" style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2)"><div class="csil">🎖 Grade</div><div class="csiv" style="color:#10b981">${g}</div></div>`;
+  sh+=`<div class="csi" style="background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2)"><div class="csil">📅 Date</div><div class="csiv" style="color:#06b6d4">${c.date}</div></div>`;
+  document.getElementById("c-st").innerHTML=sh;
+  document.getElementById("cm").classList.add("open");
+}
+function printCert(){
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><title>Certificate</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#060612;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;font-family:'Segoe UI',sans-serif}@media print{body{background:#fff!important}}</style></head><body>${document.getElementById("c-printable").outerHTML}</body></html>`);
+  w.document.close();setTimeout(()=>w.print(),600);
+}
+
+// ═══ ADMIN MENU ═══
+function aMenu(sec,el){
+  document.querySelectorAll("#pg-admin .sec").forEach(s=>s.classList.remove("on"));
+  document.getElementById("a-"+sec).classList.add("on");
+  document.querySelectorAll("#pg-admin .ni").forEach(n=>n.classList.remove("on"));
+  el.classList.add("on");
+  if(sec==="db")rADash();
+  if(sec==="us")rAUsers();
+  if(sec==="ap")rAApprv();
+  if(sec==="ct")rACerts();
+}
+
+// ═══ ADMIN RENDER ═══
+function rADash(){
+  const ul=users.filter(u=>u.role==="user").length;
+  document.getElementById("a-su").textContent=ul;
+  document.getElementById("a-sc").textContent=cards.length;
+  document.getElementById("a-sp").textContent=pending.length;
+  document.getElementById("a-st2").textContent=cards.filter(c=>c.type==="test").length;
+  const el=document.getElementById("a-qp");
+  if(!pending.length){
+    el.innerHTML=cards.length?"":`<div class="card es"><div style="font-size:40px;margin-bottom:10px">🎯</div>Koi pending action nahi. Sab clear hai!</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="card" style="border:1px solid rgba(239,68,68,.2)">
+    <h3 style="color:#ef4444;font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px">⚡ Pending Actions</h3>
+    ${pending.map(p=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1c1c38;flex-wrap:wrap">
+      ${p.photo?`<img src="${p.photo}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b;flex-shrink:0">`
+        :`<div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;flex-shrink:0">👤</div>`}
+      <div style="flex:1;min-width:120px">
+        <div style="font-weight:700;color:#fff">${p.userName}</div>
+        <div style="font-size:12px;color:#64748b">Score: <strong style="color:#f59e0b">${p.score}%</strong></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-gr btn-sm" onclick='appv(${JSON.stringify(p)})'>✅ Approve</button>
+        <button class="btn btn-r btn-sm" onclick="rej('${p.id}')">❌</button>
+      </div>
+    </div>`).join("")}
+  </div>`;
+}
+function rAUsers(){
+  const el=document.getElementById("a-ul");
+  const ul=users.filter(u=>u.role==="user");
+  if(!ul.length){el.innerHTML=`<div class="card es">Abhi koi user registered nahi.</div>`;return;}
+  el.innerHTML=ul.map(u=>`<div style="background:#0c0c1e;border:1px solid #1c1c38;border-radius:14px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    ${u.photo?`<img src="${u.photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid #06b6d4;flex-shrink:0">`
+      :`<div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>`}
+    <div style="flex:1;min-width:130px">
+      <div style="font-weight:800;color:#fff;font-size:15px">${u.name}</div>
+      <div style="font-size:12px;color:#64748b">${u.email}</div>
+      <div style="font-size:11px;color:#334155;margin-top:2px">📅 ${u.reg}</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div style="text-align:center;padding:8px 14px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.15);border-radius:10px">
+        <div style="font-size:18px;margin-bottom:2px">🎬</div>
+        <div style="font-size:16px;font-weight:800;color:#6366f1">${Object.keys(watched).filter(k=>k.startsWith(u.id+"-")).length}</div>
+      </div>
+      <div style="text-align:center;padding:8px 14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:10px">
+        <div style="font-size:18px;margin-bottom:2px">🏆</div>
+        <div style="font-size:16px;font-weight:800;color:#f59e0b">${cards.filter(c=>c.uid===u.id).length}</div>
+      </div>
+    </div>
+  </div>`).join("");
+}
+function rAApprv(){
+  const el=document.getElementById("a-al");
+  if(!pending.length){el.innerHTML=`<div class="card es"><div class="eic">✅</div>Koi pending approval nahi!</div>`;return;}
+  el.innerHTML=pending.map(p=>`<div class="card" style="margin-bottom:16px;border:1px solid rgba(99,102,241,.2)">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+      ${p.photo?`<img src="${p.photo}" style="width:58px;height:58px;border-radius:50%;object-fit:cover;border:3px solid #f59e0b;box-shadow:0 0 16px rgba(245,158,11,.2);flex-shrink:0">`
+        :`<div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>`}
+      <div style="flex:1">
+        <div style="font-weight:800;color:#fff;font-size:17px">${p.userName}</div>
+        <div style="font-size:13px;color:#64748b">${p.course}</div>
+        <div style="font-size:11px;color:#334155">${p.date}</div>
+      </div>
+      <div style="text-align:center;padding:12px 18px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:12px">
+        <div style="font-size:24px;font-weight:900;color:#f59e0b">${p.score}%</div>
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px">Score</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-family:monospace;color:#334155;background:#08080e;border-radius:8px;padding:8px 12px;margin-bottom:14px">🔑 ${p.id}</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-gr" style="flex:1;padding:13px;font-size:14px" onclick='appv(${JSON.stringify(p)})'>✅ Approve & Issue Certificate</button>
+      <button class="btn btn-r" style="padding:13px 18px" onclick="rej('${p.id}')">❌ Reject</button>
+    </div>
+  </div>`).join("");
+}
+function rACerts(){
+  const el=document.getElementById("a-cl");
+  if(!cards.length){el.innerHTML=`<div class="card es">Koi certificate issue nahi hua abhi.</div>`;return;}
+  el.innerHTML=`<div class="cg2">${cards.map(c=>`
+    <div class="cm2" style="border:1px solid ${c.type==="video"?"rgba(99,102,241,.25)":"rgba(245,158,11,.25)"}" onclick='openCert(${JSON.stringify(c)})'>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        ${c.photo?`<img src="${c.photo}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid #f59e0b">`
+          :`<div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>`}
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;color:#fff;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.userName}</div>
+          <div style="font-size:11px;color:#64748b">${c.date}</div>
+        </div>
+        <span style="font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;background:${c.type==="video"?"rgba(99,102,241,.12)":"rgba(245,158,11,.1)"};color:${c.type==="video"?"#6366f1":"#f59e0b"}">${c.type==="video"?"VIDEO":"TEST"}</span>
+      </div>
+      <div style="font-size:13px;color:#c7d2fe;font-weight:600;margin-bottom:5px">${c.course}</div>
+      ${c.score?`<div style="font-size:12px;color:#06b6d4">Score: ${c.score}%</div>`:""}
+      <div style="font-size:10px;font-family:monospace;color:#334155;margin-top:8px">${c.id}</div>
+    </div>`).join("")}</div>`;
+}
+
+function appv(item){
+  cards.push({...item});
+  pending=pending.filter(p=>p.id!==item.id);
+  toast("✅ Certificate issued!");
+  rADash();if(document.getElementById("a-ap").classList.contains("on"))rAApprv();
+  updAPBadge();
+}
+function rej(id){
+  pending=pending.filter(p=>p.id!==id);
+  toast("Rejected.","err");
+  rADash();if(document.getElementById("a-ap").classList.contains("on"))rAApprv();
+  updAPBadge();
+}
+function updAPBadge(){
+  const n=document.getElementById("ap-nav");
+  const ex=n.querySelector(".nb");if(ex)ex.remove();
+  if(pending.length)n.insertAdjacentHTML("beforeend",`<span class="nb">${pending.length}</span>`);
+}
+
+// Enter key
+document.getElementById("lp").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+document.getElementById("le").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin()});
+document.getElementById("rp").addEventListener("keydown",e=>{if(e.key==="Enter")doReg()});
+document.getElementById("rn").addEventListener("keydown",e=>{if(e.key==="Enter")doReg()});
+document.getElementById("re").addEventListener("keydown",e=>{if(e.key==="Enter")doReg()});
+
+// Init
+updAPBadge();
+</script>
+</body>
+</html>
